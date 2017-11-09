@@ -123,33 +123,6 @@ function! s:Handle.Run(input)
     call self.Tab(a:input)
   elseif has_key(s:special_key_map, a:input)
     call self.SpecialKey(a:input)
-  elseif a:input =~ "[1-9]"
-		let l:key = getchar()
-		if l:key != 0
-			let l:key = nr2char(l:key)
-		endif
-		" cycling through suggestion list
-		if l:key == "\<tab>" || l:key == "\<S-Tab>"
-			let l:ri1 = 0
-			while l:ri1 != a:input
-				call self.Tab(l:key)
-				let l:ri1 += 1
-			endwhile
-		"interruption key
-	 	elseif l:key == "\<ESC>" 
-			call self.CloseMenu()
-			let g:Cmd2_pending_cmd[0] .= a:input
-			let self.module.new_menu = 1
-		elseif l:key !~ "[0-9]"
-			call self.CloseMenu()
-			let g:Cmd2_pending_cmd[0] .= a:input
-			let self.module.new_menu = 1
-			call feedkeys(l:key,"t")
-		else
-			call self.CloseMenu()
-			let g:Cmd2_pending_cmd[0] .= a:input . l:key
-			let self.module.new_menu = 1
-		endif
   else
     call self.CloseMenu()
     let g:Cmd2_pending_cmd[0] .= a:input

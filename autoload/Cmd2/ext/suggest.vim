@@ -99,7 +99,7 @@ function! s:Handle.Run(input)
 
   " handle cmaps
   " Cmaps returns 1 if handler should exit
-  if self.Cmaps(a:input)
+  if a:input[0] !~ "[0-9]" && self.Cmaps(a:input)
     return
   endif
 
@@ -123,24 +123,29 @@ function! s:Handle.Run(input)
     call self.Tab(a:input)
   elseif has_key(s:special_key_map, a:input)
     call self.SpecialKey(a:input)
-  elseif a:input =~ "[1-9]"
+  elseif a:input[0] =~ "[1-9]"
 		let l:key = getchar()
 		if l:key != 0
 			let l:key = nr2char(l:key)
 		endif
-		" cycling through suggestion list
 		if l:key == "\<tab>" || l:key == "\<S-Tab>"
 			let l:ri1 = 0
 			while l:ri1 != a:input
 				call self.Tab(l:key)
 				let l:ri1 += 1
 			endwhile
-		"interruption key
-	 	elseif l:key == "\<ESC>" 
+		elseif l:key == "\<c-n>" || l:key == "\<c-p>" || l:key == "\<c-d>" || l:key == "\<c-f>" ||
+			\l:key == "\<c-h>" || l:key == "\<c-l>" || l:key == "\<c-k>" ||
+			\l:key == "\<c-j>" || l:key == "\<c-b>" || l:key == "\<c-w>"
+			call self.CloseMenu()
+			let g:Cmd2_pending_cmd[0] .= ""
+			let self.module.new_menu = 1
+			call feedkeys(repeat(l:key, a:input),"t")
+		elseif l:key == "\<ESC>" 
 			call self.CloseMenu()
 			let g:Cmd2_pending_cmd[0] .= a:input
 			let self.module.new_menu = 1
-		elseif l:key !~ "[0-9]"
+		elseif l:key[0] !~ "[0-9]"
 			call self.CloseMenu()
 			let g:Cmd2_pending_cmd[0] .= a:input
 			let self.module.new_menu = 1
